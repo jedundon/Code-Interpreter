@@ -1,0 +1,8 @@
+SET Str : a "Hello world!"
+Print : a
+print : "apple"
+Set int : b 37
+print : b
+label : test
+add : b 25
+print : b
