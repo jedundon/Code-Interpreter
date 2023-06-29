@@ -6,3 +6,4 @@ print : b
 label : test
 add : b 25
 print : b
+goto : test

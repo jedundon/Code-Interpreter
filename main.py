@@ -23,6 +23,7 @@ class UserProgram:
         try:
             with open(self.filename, 'r') as file:
                 self.program = file.readlines()
+                self.state = CodeInterpreter.initialize(self.state, self.program)
         except FileNotFoundError:
             print(f"File '{self.filename}' not found.")
 
@@ -33,6 +34,21 @@ class UserProgram:
             self.state.next_line += 1
 
 class CodeInterpreter:
+    @staticmethod
+    def initialize(state, program):
+        # go through each line of program and load any labels to state.labels
+        current_line = 0
+        while current_line < len(program):
+            line = program[current_line].strip()
+            operation, statement = line.split(':')
+            operation = operation.strip().lower()
+            statement = statement.strip()
+            if operation == 'label':
+                state.labels[statement] = current_line # program line of label for GOTO
+            current_line +=1
+
+        return state
+
     @staticmethod
     def execute_code(state, line):
         # You can access the program state variables using state.variables
@@ -46,8 +62,7 @@ class CodeInterpreter:
         elif operation == 'set str':
             CodeInterpreter.exe_set_str(state, statement)
         elif operation == 'set int':
-            var_name, value = statement.split(" ", 1)
-            state.variables[var_name] = int(value)
+            CodeInterpreter.exe_set_int(state, statement)
         elif operation == 'set float':
             var_name, value = statement.split(" ", 1)
             state.variables[var_name] = float(value)
@@ -59,7 +74,8 @@ class CodeInterpreter:
                 v = False
             state.variables[var_name] = value
         elif operation == 'label':
-            state.labels[statement] = state.next_line # program line of label for GOTO
+            # state.labels[statement] = state.next_line # program line of label for GOTO
+            pass
         elif operation == 'goto':
             state.next_line = state.labels[statement] # set next line to the label's line 
         elif operation == 'add':
@@ -95,7 +111,29 @@ class CodeInterpreter:
         except ValueError:
             print(f"Invalid syntax in 'set str' operation: {statement}")
 
-program = UserProgram(r'Code Interpretter\\usercode.txt')
+    @staticmethod
+    def exe_set_int(state: State, statement: str):
+        # SET INT operation
+        try:
+            var_name, value = statement.split(" ", 1)
+            state.variables[var_name] = int(value)
+        except ValueError:
+            print(f"Invalid syntax in 'set int' operation: {statement}")
+
+program = UserProgram(r'Code Interpreter\\usercode.txt')
 program.load_program()
 program.execute_program()
 
+# if : blah blah blah [
+#   
+# ]
+
+# if : condition
+# stuff
+# if : condition
+# stuff 2
+# end :
+# stuff 3
+# else :
+# other stuff
+# end :
