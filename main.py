@@ -126,7 +126,7 @@ program.execute_program()
 
 # if : blah blah blah [
 #   
-# ]
+# ] ff
 
 # if : condition
 # stuff
